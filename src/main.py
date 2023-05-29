@@ -1,4 +1,5 @@
 from Series import Series
+from src.DataFrame import DataFrame
 
 
 def main():
@@ -10,9 +11,24 @@ def main():
     print(a_s)
     print(b_s)
 
+
+    df_a = DataFrame(column=["a", "b", "c"], data=[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 20]])
+
+    c_s_a = Series([1, 2, 3, 4], "a")
+    c_s_b = Series([3, 4, 6, 1], "b")
+    c_s_c = Series([30, 14, 26, 31], "c")
+    df_b = DataFrame([c_s_a, c_s_b, c_s_c], clone=True);
+
+    #x = df_a.iloc[0, 2]
+    #x2 = df_a.iloc[1:2, 2]
+    maxdf = df_b.max()
+
     print(type(a_s.iloc[2:1]))
     print_series(a_s)
     print_series(b_s)
+
+
+
 
 def print_series(serie: Series):
     print(serie.max())
