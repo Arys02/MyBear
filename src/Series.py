@@ -1,4 +1,6 @@
 import numbers
+from math import sqrt
+
 
 class Series:
     def __init__(self, data, name, dtype=None, clone=False):
@@ -13,7 +15,7 @@ class Series:
 
     @property
     def iloc(self):
-        return self.data
+        return self
 
     def __getitem__(self, item):
         if isinstance(item, slice):
@@ -28,12 +30,12 @@ class Series:
 
     def mean(self):
         if self.dtype is not None and isinstance(self.data[0], numbers.Number):
-            return sum(self.data) / len(self.data) if len(self.data) > 0 else None
+            return sum(self.data) / len(self.data)
 
     def std(self):
         if self.dtype is not None and isinstance(self.data[0], numbers.Number):
             mean = self.mean()
-            return (sum((x - mean) ** 2 for x in self.data) / len(self.data)) ** 0.5 if len(self.data) > 0 else None
+            return sqrt(sum((x - mean) ** 2 for x in self.data) / (len(self.data) - 1))
 
     def count(self):
         return len(self.data)
