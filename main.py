@@ -34,9 +34,18 @@ def main():
     print(x)
     print(x.min())
 
+    #print(type(a_s.iloc[2:1]))
+    #print_series(a_s)
+    #print_series(b_s)
+
+    sports_frame = DataFrame(column=["Name", "Record", "Super Bowl Wins", "Uniform Coolness"],
+                            data=[["Cheifs", "7-7", 3, "OK"], ["Chargers", "0-14", 0, "Sick"],
+                                  ["Broncos", "7-7", 3, "lame"], ["Bills", "7-7", 1, "OK"]])
+    sports_frame.groupby(by=["Name", "Record"])
+
 
 def print_series(serie: Series):
-    print(serie.max())
+    #print(serie.max())
     print(serie.min())
     print(serie.mean())
     print(serie.std())
