@@ -27,10 +27,10 @@ def main():
     x3 = df_a.iloc[2, 0:3]
     x4 = df_a.iloc[0:2, 0:3]
 
-    print("x : \n"+ str(x))
-    print("x2 : \n" + str(x2))
-    print("x3 :\n" + str(x3))
-    print("x4 :\n" + str(x4))
+    print("x  [0, 2]   : \n"+ str(x))
+    print("x2 [1:3, 2] : \n" + str(x2))
+    print("x3 [2, 0:3] :\n" + str(x3))
+    print("x4 [0:2, 0:3] :\n" + str(x4))
 
 
     #print(type(a_s.iloc[2:1]))

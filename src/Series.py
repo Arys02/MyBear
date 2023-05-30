@@ -7,6 +7,7 @@ class Series:
         self.data = data.copy() if clone else data
         self.name = name
         self.size = len(data)
+        #TODO nombre de NaN dans la serie
         self.missing_values = self.data.count
 
         self.dtype = type(self.data[0]) \

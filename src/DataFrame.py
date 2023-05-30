@@ -43,8 +43,8 @@ class DataFrame:
             return self.data[item[1]][item[0]].copy()
         #iloc[n, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], int):
-            lst = [x[item[0]] for x in self.data[item[1]]]
-            s = [Series(lst, "col")]
+            lst = [x[item[0]:(item[0] + 1)] for x in self.data[item[1]]]
+            s = [Series(l.data, l.name) for l in lst]
             return DataFrame(data=s, clone=True)
         #iloc[x:y, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], slice):
