@@ -26,16 +26,20 @@ class Series:
             return Series(self.data[item], self.name)
         return self.data[item]
 
+    @property
     def max(self):
         return max(self.data)
 
+    @property
     def min(self):
         return min(self.data)
 
+    @property
     def mean(self):
         if self.dtype is not None and isinstance(self.data[0], numbers.Number):
             return sum(self.data) / len(self.data)
 
+    @property
     def std(self):
         if self.dtype is not None and isinstance(self.data[0], numbers.Number):
             mean = self.mean()
