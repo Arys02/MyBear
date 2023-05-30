@@ -1,4 +1,4 @@
-from Series import Series
+from src.Series import Series
 from src.DataFrame import DataFrame
 
 

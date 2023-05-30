@@ -2,7 +2,7 @@ import copy
 import numbers
 from typing import List, Dict, Union, Callable, Any
 
-from Series import Series
+from src.Series import Series
 
 
 class DataFrame:
