@@ -17,6 +17,9 @@ class Series:
     def iloc(self):
         return self
 
+    def copy(self):
+        return Series(self.data, self.name, clone=True)
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return Series(self.data[item], self.name)

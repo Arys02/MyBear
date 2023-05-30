@@ -9,7 +9,7 @@ class DataFrame:
     def __init__(self, data, column=None, dtype=None, clone=False) -> None:
         self.size = len(data)
         if isinstance(data, list) and self.size > 0 and isinstance(data[0], Series):
-            self.data = copy.deepcopy(data) if clone else data
+            self.data = [copy.copy(x) for x in data] if clone else data
         elif isinstance(data, list) and isinstance(column, list):
             self.data = [Series(value, col, clone=clone) for value, col in zip(data, column)]
         else:
@@ -21,19 +21,38 @@ class DataFrame:
     def iloc(self):
         return self
 
+    def __str__(self):
+        s = ""
+        for i in range(0, self.size):
+            s += self.data[i].name + " "
+        s += "\n"
+        for i in range(0, self.data[0].size):
+            for j in range(0, self.size):
+                s += str(self[i, j]) + " "
+            s += "\n"
+        return s
+
     def __getitem__(self, item):
-        # TODO
         if len(item) != 2:
             raise TypeError
+        #iloc[n, n] -> VALUE
         if isinstance(item[0], int) and isinstance(item[1], int):
             return self.data[item[1]][item[0]]
+        #iloc[a:b, n] -> SERIES
         if isinstance(item[0], slice) and isinstance(item[1], int):
             return self.data[item[1]][item[0]].copy()
-
+        #iloc[n, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], int):
-            return self.data[item[1]][item[0]].copy()
+            lst = [x[item[0]] for x in self.data[item[1]]]
+            s = [Series(lst, "col")]
+            return DataFrame(data=s, clone=True)
+        #iloc[x:y, a:b] -> DATAFRAME
+        if isinstance(item[1], slice) and isinstance(item[0], slice):
+            lst = [x[item[0]] for x in self.data[item[1]]]
+            s = [Series(l.data, l.name) for l in lst]
+            return DataFrame(data=s, clone=True)
 
-        return 0
+        raise IndexError
 
     def max(self):
         return DataFrame(data=[Series([x.max() for x in self.data], "max")])
