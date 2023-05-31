@@ -70,6 +70,7 @@ class Series:
 
             self.size = len(self.data)
             self.missing_values = self.data.count(None)
+        return self.copy()
 
 
 

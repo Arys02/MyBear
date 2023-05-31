@@ -10,7 +10,7 @@ class DataFrame:
         self.size = len(data)
         if isinstance(data, list) and self.size > 0 and isinstance(data[0], Series):
             self.__height = get_series_list_height(data)
-            self.data = [copy.copy(x) for x in data] if clone else data
+            self.data = [x.resize(self.__height) for x in data]
         elif isinstance(data, list) and isinstance(column, list):
             self.__height = get_list_height(data)
             self.data = [Series(value, col, clone=clone, capacity=self.__height) for value, col in zip(data, column)]
