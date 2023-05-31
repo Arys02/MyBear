@@ -20,29 +20,33 @@ class Series:
            Le type de données de la Série.
        """
 
-    def __init__(self, data, name, dtype=None, clone=False):
+    def __init__(self, data, name, dtype=None, clone=False, capacity=None):
         """
                 Initialise la Série avec des données, un nom et éventuellement un type de données.
 
                 Si clone est True, crée une copie des données. Sinon, utilise les données directement.
                 """
         self.data = data.copy() if clone else data
+        if capacity is not None and capacity > len(data):
+            for i in range(len(data), capacity):
+                self.data.append(None)
         self.name = name
-        self.size = len(data)
 
+        self.size = len(data)
         self.missing_values = self.data.count(None)
 
         self.dtype = type(self.data[0]) \
             if self.size > 0 and dtype is None \
             else None
 
-        self._max = max(self.data)
-        self._min = min(self.data)
-        self._mean = sum(self.data) / len(self.data) \
-            if self.dtype is not None and isinstance(self.data[0], numbers.Number) \
+        self._existing_data = [x for x in self.data if x is not None]
+        self._max = max(self._existing_data)
+        self._min = min(self._existing_data)
+        self._mean = sum(self._existing_data) / len(self._existing_data) \
+            if self.dtype is not None and isinstance(self._existing_data[0], numbers.Number) \
             else None
-        self._std = sqrt(sum((x - self._mean) ** 2 for x in self.data) / (len(self.data) - 1)) \
-            if self.dtype is not None and isinstance(self.data[0], numbers.Number) \
+        self._std = sqrt(sum((x - self._mean) ** 2 for x in self._existing_data) / (len(self._existing_data))) \
+            if self.dtype is not None and isinstance(self._existing_data[0], numbers.Number) \
             else None
         self._count = len(self.data) - self.data.count(0) - self.data.count(None)
 
@@ -58,6 +62,18 @@ class Series:
         Permet le renvois d'une copie de la Série.
         """
         return Series(self.data, self.name, clone=True)
+
+    def resize(self, capacity):
+        if capacity is not None and capacity > len(self.data):
+            for i in range(len(self.data), capacity):
+                self.data.append(None)
+
+            self.size = len(self.data)
+            self.missing_values = self.data.count(None)
+
+
+
+
 
     def __getitem__(self, item):
         """

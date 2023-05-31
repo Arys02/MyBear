@@ -13,7 +13,7 @@ class DataFrame:
             self.data = [copy.copy(x) for x in data] if clone else data
         elif isinstance(data, list) and isinstance(column, list):
             self.__height = get_list_height(data)
-            self.data = [Series(value, col, clone=clone) for value, col in zip(data, column)]
+            self.data = [Series(value, col, clone=clone, capacity=self.__height) for value, col in zip(data, column)]
         else:
             raise TypeError
 
