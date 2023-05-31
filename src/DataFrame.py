@@ -1,6 +1,6 @@
 import copy
-import numbers
 from typing import List, Dict, Union, Callable, Any
+import csv
 
 from src.Series import Series
 
@@ -76,8 +76,13 @@ class DataFrame:
     def count(self):
         return DataFrame(data=[Series([x.count() for x in self.data], "std")])
 
-    def read_csv(path: str, delimiter: str = ""):
-        return 0  # TODO
+    def read_csv(self: str, delimiter: str = ","):
+        with open(self, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=delimiter)
+            rows = list(map(list, zip(* list(reader))))
+        s = [Series(list(map(int, x[1:])), x[0]) for x in rows]
+        return DataFrame(data=s)
+
 
     def read_json(
             path: str,
