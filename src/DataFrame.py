@@ -17,6 +17,13 @@ class DataFrame:
 
         self.dtype = self.data[0].dtype if self.size > 0 and dtype is None else None
 
+        self.__columns_indexes = {}
+        for x in range(self.size):
+            if self.data[x].name in self.__columns_indexes.keys():
+                raise ValueError("duplicate key '{0}' found".format(self.data[x].name))
+
+            self.__columns_indexes[self.data[x].name] = self.data[x]
+
     @property
     def iloc(self):
         return self
@@ -80,10 +87,41 @@ class DataFrame:
 
     def groupby(
             self,
-            by: Union[List[str], str],
-            agg: Dict[str, Callable[[List[Any]], Any]]
+            by: Union[List[str], str] = None,
+            agg: Dict[str, Callable[[List[Any]], Any]] = None
     ):
+        real_list = self.check_columns(by)
+        if len(real_list) < 1:
+            return
+
+        new_df = self.new_groupby_df(real_list)
+
         return 0  # TODO
+
+    def new_groupby_df(self, real_list):
+        print('yes')
+
+        for x in range(len(real_list)):
+            column_to_keep = self.get_column_names().index(real_list[x])
+            print(column_to_keep)
+        return self
+
+    def check_columns(self, by):
+        real_list = []
+        for column in by:
+            if column not in self.get_column_names():
+                print("error, column is not in list")
+            else:
+                real_list.append(column)
+        if len(real_list) < 1:
+            print("GroupBy aborted, no matching columns passed")
+        return real_list
+
+    def get_column_names(self):
+        names = []
+        for x in range(self.size):
+            names.append(self.data[x].name)
+        return names
 
     def join(
             self,
