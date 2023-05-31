@@ -18,8 +18,8 @@ def main():
     df_a = DataFrame(column=["a", "b", "c"], data=[[1, 2, 3, 4],
                                                    [5, 6, 7, 4, 1, 8],
                                                    [9, 10, 11, 20]])
-    # print(df_b)
-    print(df_a)
+    print(df_b)
+    #print(df_a)
     x = df_a.iloc[0, 2]
     x2 = df_a.iloc[1:3, 2]
     x3 = df_a.iloc[2, 0:3]
