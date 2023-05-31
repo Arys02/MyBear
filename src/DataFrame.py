@@ -97,17 +97,12 @@ class DataFrame:
             by: Union[List[str], str] = None,
             agg: Dict[str, Callable[[List[Any]], Any]] = None
     ):
-        real_list = self.check_columns(by)
+        real_list = self.check_columns(by, agg)
         if len(real_list) < 1:
             return
-        #
-        # for x in range(len(real_list)):
-        #     column_to_keep = column_names.index(real_list[x])
-        #     print(column_to_keep)
 
-        self.new_groupby_df(real_list)
-
-        return 0  # TODO
+        self.__dict__.update(self.new_groupby_df(real_list).__dict__)
+        return
 
     def new_groupby_df(self, real_list):
         keys = []
@@ -115,15 +110,26 @@ class DataFrame:
         for x in range(len(real_list)):
             keys.append(self.__columns_indexes[real_list[x]].name)
             values.append(self.__columns_indexes[real_list[x]])
-            #print(self.__columns_indexes[real_list[x]])
-        print(keys)
-        print(values)
 
-        return self
+        new_df = DataFrame(column=keys, data=values)
+        return new_df
 
-    def check_columns(self, by):
+    def check_columns(self, by, agg=None):
+        if agg is None:
+            agg = {}
         real_list = []
+
+        if self.is_empty_dict(agg):
+            pass
+        elif self.is_overlapping_arrays(by, agg.keys()):
+            raise ValueError("by and aggregate contain the same value")
+
         for column in by:
+            if column not in self.__columns_indexes.keys():
+                print("error, column is not in list")
+            else:
+                real_list.append(column)
+        for column in agg:
             if column not in self.__columns_indexes.keys():
                 print("error, column is not in list")
             else:
@@ -131,6 +137,12 @@ class DataFrame:
         if len(real_list) < 1:
             print("GroupBy aborted, no matching columns passed")
         return real_list
+
+    def is_empty_dict(self, dict):
+        return not bool(dict)
+
+    def is_overlapping_arrays(self, array1, array2):
+        return not set(array1).isdisjoint(set(array2))
 
     def get_column_names(self):
         names = []
