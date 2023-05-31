@@ -1,5 +1,6 @@
 import copy
 from typing import List, Dict, Union, Callable, Any
+from typing_extensions import Self
 import csv
 
 from src.Series import Series
@@ -40,20 +41,23 @@ class DataFrame:
         return s
 
     def __getitem__(self, item):
+        if isinstance(item, str):
+            return self.__columns_indexes[item]
+
         if len(item) != 2:
             raise TypeError
-        #iloc[n, n] -> VALUE
+        # iloc[n, n] -> VALUE
         if isinstance(item[0], int) and isinstance(item[1], int):
             return self.data[item[1]][item[0]]
-        #iloc[a:b, n] -> SERIES
+        # iloc[a:b, n] -> SERIES
         if isinstance(item[0], slice) and isinstance(item[1], int):
             return self.data[item[1]][item[0]].copy()
-        #iloc[n, a:b] -> DATAFRAME
+        # iloc[n, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], int):
             lst = [x[item[0]:(item[0] + 1)] for x in self.data[item[1]]]
             s = [Series(l.data, l.name) for l in lst]
             return DataFrame(data=s, clone=True)
-        #iloc[x:y, a:b] -> DATAFRAME
+        # iloc[x:y, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], slice):
             lst = [x[item[0]] for x in self.data[item[1]]]
             s = [Series(l.data, l.name) for l in lst]
@@ -79,10 +83,9 @@ class DataFrame:
     def read_csv(self: str, delimiter: str = ","):
         with open(self, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
-            rows = list(map(list, zip(* list(reader))))
+            rows = list(map(list, zip(*list(reader))))
         s = [Series(list(map(int, x[1:])), x[0]) for x in rows]
         return DataFrame(data=s)
-
 
     def read_json(
             path: str,
@@ -130,8 +133,24 @@ class DataFrame:
 
     def join(
             self,
-            other,
+            other: Self,
             left_on: Union[List[str], str],
             right_on: Union[List[str], str],
-            how: str = "left"):
-        return 0  # TODO
+            how: str = "left") -> Self:
+
+        left_indexes = get_series_indexes(left_on)
+        right_indexes = get_series_indexes(right_on)
+
+        joined_series = []
+        for left_index in left_indexes:
+            joined_series.append(self[left_index])
+        for right_index in right_indexes:
+            joined_series.append(other[right_index])
+
+        return DataFrame(joined_series)
+
+
+def get_series_indexes(indexes: Union[List[str], str]) -> List[str]:
+    if isinstance(indexes, str):
+        return [indexes]
+    return indexes
