@@ -97,50 +97,27 @@ class DataFrame:
         # for x in range(len(real_list)):
         #     column_to_keep = column_names.index(real_list[x])
         #     print(column_to_keep)
-        new_df = self.new_groupby_df(self.get_column_names())
 
-        real_list = self.check_columns(by)
-        if len(real_list) < 1:
-            return
-
-        new_df = self.new_groupby_df(real_list)
+        self.new_groupby_df(real_list)
 
         return 0  # TODO
 
-    def new_groupby_df(self, column_names):
-        print('yes')
-
-        return self;
-
-    def check_columns(self, by):
-        real_list = []
-        for column in by:
-            if column not in self.get_column_names():
-                print("error, column is not in list")
-            else:
-                real_list.append(column)
-        if len(real_list) < 1:
-            print("GroupBy aborted, no matching columns passed")
-        return real_list
-
-    def get_column_names(self):
-        names = []
-        for x in range(self.size):
-            names.append(self.data[x].name)
-        return names
-
     def new_groupby_df(self, real_list):
-        print('yes')
-
+        keys = []
+        values = []
         for x in range(len(real_list)):
-            column_to_keep = self.get_column_names().index(real_list[x])
-            print(column_to_keep)
+            keys.append(self.__columns_indexes[real_list[x]].name)
+            values.append(self.__columns_indexes[real_list[x]])
+            #print(self.__columns_indexes[real_list[x]])
+        print(keys)
+        print(values)
+
         return self
 
     def check_columns(self, by):
         real_list = []
         for column in by:
-            if column not in self.get_column_names():
+            if column not in self.__columns_indexes.keys():
                 print("error, column is not in list")
             else:
                 real_list.append(column)
