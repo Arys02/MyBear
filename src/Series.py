@@ -70,6 +70,10 @@ class Series:
 
             self.size = len(self.data)
             self.missing_values = self.data.count(None)
+
+        elif capacity is not None and capacity < len(self.data):
+            return self[0:capacity]
+
         return self.copy()
 
 
