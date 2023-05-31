@@ -41,6 +41,7 @@ def main():
                             data=[["Cheifs", "7-7", 3, "OK"], ["Chargers", "0-14", 0, "Sick"],
                                   ["Broncos", "7-7", 3, "lame"], ["Bills", "7-7", 1, "OK"]])
     sports_frame.groupby(by=["Name", "Record"])
+    print(sports_frame)
 
 
 def print_series(serie: Series):
