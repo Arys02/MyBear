@@ -135,3 +135,20 @@ class DataFrame:
             right_on: Union[List[str], str],
             how: str = "left"):
         return 0  # TODO
+
+def get_series_list_height(series_list: List[Series]) -> int:
+    height = 0
+    for series in series_list:
+        if series.size > height:
+            height = series.size
+
+    return height
+
+
+def get_list_height(some_list_of_list: List[List]) -> int:
+    height = 0
+    for some_list in some_list_of_list:
+        if len(some_list) > height:
+            height = len(some_list)
+
+    return height
