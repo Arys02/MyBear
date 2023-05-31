@@ -102,14 +102,13 @@ class DataFrame:
             return
 
         self.__dict__.update(self.new_groupby_df(real_list).__dict__)
-        return
 
     def new_groupby_df(self, real_list):
         keys = []
         values = []
         for x in range(len(real_list)):
-            keys.append(self.__columns_indexes[real_list[x]].name)
-            values.append(self.__columns_indexes[real_list[x]])
+            keys.append(real_list[x].name)
+            values.append(real_list[x].data)
 
         new_df = DataFrame(column=keys, data=values)
         return new_df
@@ -117,29 +116,40 @@ class DataFrame:
     def check_columns(self, by, agg=None):
         if agg is None:
             agg = {}
-        real_list = []
 
         if self.is_empty_dict(agg):
             pass
         elif self.is_overlapping_arrays(by, agg.keys()):
-            raise ValueError("by and aggregate contain the same value")
+            raise ValueError("by and aggregate contain the same key")
 
-        for column in by:
-            if column not in self.__columns_indexes.keys():
-                print("error, column is not in list")
-            else:
-                real_list.append(column)
-        for column in agg:
-            if column not in self.__columns_indexes.keys():
-                print("error, column is not in list")
-            else:
-                real_list.append(column)
+        real_list = self.data_to_series_list(by, agg)
+
         if len(real_list) < 1:
             print("GroupBy aborted, no matching columns passed")
         return real_list
 
-    def is_empty_dict(self, dict):
-        return not bool(dict)
+    def data_to_series_list(self, by, agg=None):
+        real_list = []
+
+        for name in by:
+            if name not in self.__columns_indexes.keys():
+                print("error, column is not in list")
+            else:
+                final_series_by = Series(data=self.__columns_indexes[name].data, name=name)
+                real_list.append(final_series_by)
+        for column in agg:
+            if column not in self.__columns_indexes.keys():
+                print("error, column is not in list")
+            else:
+                new_list = []
+                for x in range(len(self.__columns_indexes[column].data)):
+                    new_list.append(agg[column])
+                final_series_arr = Series(data=new_list, name=column)
+                real_list.append(final_series_arr)
+
+        return real_list
+    def is_empty_dict(self, the_dict):
+        return not bool(the_dict)
 
     def is_overlapping_arrays(self, array1, array2):
         return not set(array1).isdisjoint(set(array2))

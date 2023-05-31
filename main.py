@@ -38,12 +38,21 @@ def main():
     #print_series(a_s)
     #print_series(b_s)
 
-    sports_frame = DataFrame(column=["Name", "Record", "Super Bowl Wins", "Uniform Coolness"],
-                            data=[["Cheifs", "7-7", 3, "OK"], ["Chargers", "0-14", 0, "Sick"],
-                                  ["Broncos", "7-7", 3, "lame"], ["Bills", "7-7", 1, "OK"]])
-    sports_frame.groupby(by=["Name", "Record"])
-    print(sports_frame)
+    # sports_frame = DataFrame(column=["Name", "Record", "Super Bowl Wins", "Uniform Coolness"],
+    #                         data=[["Cheifs", "7-7", 3, "OK"], ["Chargers", "0-14", 0, "Sick"],
+    #                               ["Broncos", "7-7", 3, "lame"], ["Bills", "7-7", 1, "OK"]])
+    # sports_frame.groupby(by=["Name", "Record"], agg={"Super Bowl Wins": sports_frame.data[0],
+    #                                                  "Uniform Coolness": sports_frame.data[1]
+    #                                                 })
 
+    reg_frame = DataFrame(column=["a", "b", "c", "d"],
+                            data=[[1, 2, 3, 4], [5, 6, 7, 8],
+                                  [9, 10, 11, 12], [13, 14, 15, 16]])
+    reg_frame.groupby(by=["a", "b"], agg={"c": reg_frame.data[2].max,
+                                          "d": reg_frame.data[3].max
+                                          })
+
+    print(reg_frame)
 
 def print_series(serie: Series):
     #print(serie.max())
