@@ -10,9 +10,11 @@ class DataFrame:
     def __init__(self, data, column=None, dtype=None, clone=False) -> None:
         self.size = len(data)
         if isinstance(data, list) and self.size > 0 and isinstance(data[0], Series):
+            self.__height = get_series_list_height(data)
             self.data = [copy.copy(x) for x in data] if clone else data
         elif isinstance(data, list) and isinstance(column, list):
-            self.data = [Series(value, col, clone=clone) for value, col in zip(data, column)]
+            self.__height = get_list_height(data)
+            self.data = [Series(value, col, clone=clone, capacity=self.__height) for value, col in zip(data, column)]
         else:
             raise TypeError
 
@@ -154,3 +156,20 @@ def get_series_indexes(indexes: Union[List[str], str]) -> List[str]:
     if isinstance(indexes, str):
         return [indexes]
     return indexes
+
+def get_series_list_height(series_list: List[Series]) -> int:
+    height = 0
+    for series in series_list:
+        if series.size > height:
+            height = series.size
+
+    return height
+
+
+def get_list_height(some_list_of_list: List[List]) -> int:
+    height = 0
+    for some_list in some_list_of_list:
+        if len(some_list) > height:
+            height = len(some_list)
+
+    return height
