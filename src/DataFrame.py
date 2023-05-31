@@ -9,8 +9,10 @@ class DataFrame:
     def __init__(self, data, column=None, dtype=None, clone=False) -> None:
         self.size = len(data)
         if isinstance(data, list) and self.size > 0 and isinstance(data[0], Series):
+            self.__height = get_series_list_height(data)
             self.data = [copy.copy(x) for x in data] if clone else data
         elif isinstance(data, list) and isinstance(column, list):
+            self.__height = get_list_height(data)
             self.data = [Series(value, col, clone=clone) for value, col in zip(data, column)]
         else:
             raise TypeError
