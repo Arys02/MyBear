@@ -69,8 +69,8 @@ class DataFrame:
     def count(self):
         return DataFrame(data=[Series([x.count() for x in self.data], "std")])
 
-    def read_csv(path: str, delimiter: str = ","):
-        with open(path, newline='') as csvfile:
+    def read_csv(self: str, delimiter: str = ","):
+        with open(self, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
             rows = list(map(list, zip(* list(reader))))
         s = [Series(list(map(int, x[1:])), x[0]) for x in rows]
