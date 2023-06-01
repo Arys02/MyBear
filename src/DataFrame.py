@@ -133,26 +133,69 @@ class DataFrame:
 
     def data_to_series_list(self, by, agg=None):
         real_list = []
+        used_values = []
+        same_row_numbers = []
 
-        for name in by:
-            if name not in self.__columns_indexes.keys():
-                print("error, column is not in list")
-            elif name in real_list:
-                pass
-            else:
-                final_series_by = Series(data=self.__columns_indexes[name].data, name=name)
-                real_list.append(final_series_by)
+        for x in range(len(by)):
+            for y in range(len(by[x])):
+                if self.__columns_indexes[by[x]].data[y] not in self.__columns_indexes[by[x]].data:
+                    print("error, column is not in list")
+                elif self.__columns_indexes[by[x]].data[y] in used_values:
+                    print("used")
+                    same_row_numbers.append(y)
+                    continue
+                else:
+                    #final_series_by = Series(data=self.__columns_indexes[by[x]].data, name=by[x])
+                    #real_list.append(final_series_by)
+                    #print("This is the name " + str(name))
+                    used_values.append(self.__columns_indexes[by[x]].data[y])
+
+        for x in range(len(same_row_numbers)):
+            print(self.__columns_indexes[same_row_numbers[x]])
+            print(same_row_numbers)
+            print(self.__columns_indexes[by[used_values[x]].data.index()])
+
         for column in agg:
             if column not in self.__columns_indexes.keys():
                 print("error, column is not in list")
             else:
                 new_list = []
                 for x in range(len(self.__columns_indexes[column].data)):
-                    new_list.append(agg[column])
-                final_series_arr = Series(data=new_list, name=column)
-                real_list.append(final_series_arr)
+                    pass
+                    #new_list.append(agg[column])
+                #final_series_arr = Series(data=new_list, name=column)
+                #real_list.append(final_series_arr)
         print(real_list)
+        # print(used_values)
         return real_list
+
+    # def data_to_series_list(self, by, agg=None):
+    #     real_list = []
+    #     used_columns = []
+    #
+    #     for x in range(len(by)):
+    #         if by[x] not in self.__columns_indexes.keys():
+    #             print("error, column is not in list")
+    #         elif self.__columns_indexes[by[x]] in used_columns:
+    #             print("used")
+    #             continue
+    #         else:
+    #             final_series_by = Series(data=self.__columns_indexes[by[x]].data, name=by[x])
+    #             real_list.append(final_series_by)
+    #             #print("This is the name " + str(name))
+    #             used_columns.append(by[x])
+    #     for column in agg:
+    #         if column not in self.__columns_indexes.keys():
+    #             print("error, column is not in list")
+    #         else:
+    #             new_list = []
+    #             for x in range(len(self.__columns_indexes[column].data)):
+    #                 print(agg[column])
+    #                 #new_list.append(agg[column])
+    #             #final_series_arr = Series(data=new_list, name=column)
+    #             #real_list.append(final_series_arr)
+    #     print(used_columns)
+    #     return real_list
     def is_empty_dict(self, the_dict):
         return not bool(the_dict)
 

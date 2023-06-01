@@ -30,9 +30,9 @@ def main():
     print("x3 [2, 0:3] :\n" + str(x3))
     print("x4 [0:2, 0:3] :\n" + str(x4))
 
-    x = DataFrame.read_csv("src/lol.csv")
-    print(x)
-    print(x.min())
+    # x = DataFrame.read_csv("src/lol.csv")
+    # print(x)
+    # print(x.min())
 
     #print(type(a_s.iloc[2:1]))
     #print_series(a_s)
@@ -56,9 +56,9 @@ def main():
 
     reg_frame.groupby(by=["name", "b"], agg={"c": min,
                                              "d": max
-                                          })
+                                             })
 
-    #print(reg_frame)
+    print(reg_frame)
 
 def print_series(serie: Series):
     #print(serie.max())
