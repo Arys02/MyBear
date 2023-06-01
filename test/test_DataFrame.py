@@ -16,8 +16,6 @@ class TestDataFrame(TestCase):
         dataframe_left = DataFrame([series_left], clone=True)
         dataframe_right = DataFrame([series_right], clone=True)
 
-        print(dataframe_left["a"])
-
         dataframe_joined = dataframe_left.join(dataframe_right, left_on="a", right_on="b")
 
         self.assertEqual(dataframe_joined.iloc[0, 0], 1)
@@ -31,8 +29,8 @@ class TestDataFrame(TestCase):
 
         dataframe_joined = dataframe_left.join(dataframe_right, left_on="a", right_on="b")
 
-        self.assertEqual(math.isnan(dataframe_joined.iloc[2, 1]), True)
-        self.assertEqual(math.isnan(dataframe_joined.iloc[3, 1]), True)
+        self.assertTrue(dataframe_joined.iloc[2, 1] is None)
+        self.assertTrue(dataframe_joined.iloc[3, 1] is None)
 
     def test_joinShouldJoinMultipleLeftOnValues(self):
         first_series_left = Series([1, 1, 1, 1], "a")
@@ -61,3 +59,16 @@ class TestDataFrame(TestCase):
         self.assertEqual(dataframe_joined.iloc[0, 0], 1)
         self.assertEqual(dataframe_joined.iloc[0, 1], 2)
         self.assertEqual(dataframe_joined.iloc[0, 2], 3)
+
+    def test_joinShouldShortenRightDataframe(self):
+        series_left = Series([1, 1], "a")
+        series_right = Series([2, 2, 2, 2], "b")
+
+        dataframe_left = DataFrame([series_left], clone=True)
+        dataframe_right = DataFrame([series_right], clone=True)
+
+        dataframe_joined = dataframe_left.join(dataframe_right, left_on="a", right_on="b")
+
+        print(dataframe_joined)
+
+        self.assertEqual(dataframe_joined["b"].size, 2)
