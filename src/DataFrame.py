@@ -168,6 +168,11 @@ class DataFrame:
         print(real_list)
         # print(used_values)
         return real_list
+    def is_empty_dict(self, the_dict):
+        return not bool(the_dict)
+
+    def is_overlapping_arrays(self, array1, array2):
+        return not set(array1).isdisjoint(set(array2))
 
     # def data_to_series_list(self, by, agg=None):
     #     real_list = []
