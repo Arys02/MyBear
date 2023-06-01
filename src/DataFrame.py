@@ -121,12 +121,17 @@ class DataFrame:
             print("GroupBy aborted, no matching columns passed")
         return real_list
 
+    def get_columns_indexes(self):
+        return self.__columns_indexes
+
     def data_to_series_list(self, by, agg=None):
         real_list = []
 
         for name in by:
             if name not in self.__columns_indexes.keys():
                 print("error, column is not in list")
+            elif name in real_list:
+                pass
             else:
                 final_series_by = Series(data=self.__columns_indexes[name].data, name=name)
                 real_list.append(final_series_by)
@@ -139,7 +144,7 @@ class DataFrame:
                     new_list.append(agg[column])
                 final_series_arr = Series(data=new_list, name=column)
                 real_list.append(final_series_arr)
-
+        print(real_list)
         return real_list
     def is_empty_dict(self, the_dict):
         return not bool(the_dict)

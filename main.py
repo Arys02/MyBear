@@ -44,14 +44,20 @@ def main():
     #                                                  "Uniform Coolness": sports_frame.data[1]
     #                                                 })
 
-    reg_frame = DataFrame(column=["a", "b", "c", "d"],
-                            data=[[1, 2, 3, 4], [5, 6, 7, 8],
-                                  [9, 10, 11, 12], [13, 14, 15, 16]])
-    reg_frame.groupby(by=["a", "b"], agg={"c": reg_frame.data[2].max,
-                                          "d": reg_frame.data[3].max
+    reg_frame = DataFrame(column=["name", "b", "c", "d"],
+                          data=[["bummer", "bummer", "super", "super"], [5, 6, 7, 8],
+                                [6, 10, 11, 12], [7, 14, 15, 16]])
+
+    # reg_frame = DataFrame(column=["a", "b", "c", "d"],
+    #                       data=[[1, 2, 3, 4], [1, 6, 7, 8],
+    #                             [1, 10, 11, 12], [1, 14, 15, 16]])
+    #print("the stuff is " + str(reg_frame.get_columns_indexes()["c"].max))
+
+    reg_frame.groupby(by=["name", "b"], agg={"c": min,
+                                             "d": max
                                           })
 
-    print(reg_frame)
+    #print(reg_frame)
 
 def print_series(serie: Series):
     #print(serie.max())
