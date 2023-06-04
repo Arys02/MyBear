@@ -43,15 +43,19 @@ def main():
     #                                                 })
 
     reg_frame = DataFrame(column=["name", "b", "c", "d"],
-                          data=[["bummer", "bummer", "super", "super"], [5, 6, 7, 8],
-                                [6, 10, 11, 12], [7, 14, 15, 16]])
+                          data=[["bummer", "bummer", "super", "super", "bummer", "tree", "tree"], [5, 6, 7, 8, 9, 12, 55],
+                                [6, 10, 11, 12, 13, 58, 90], [7, 14, 15, 16, 16, 33, 77]])
 
     # reg_frame = DataFrame(column=["a", "b", "c", "d"],
     #                       data=[[1, 2, 3, 4], [1, 6, 7, 8],
     #                             [1, 10, 11, 12], [1, 14, 15, 16]])
     #print("the stuff is " + str(reg_frame.get_columns_indexes()["c"].max))
 
-    reg_frame.groupby(by=["name", "b"], agg={"c": min,
+    # reg_frame.groupby(by=["name", "b"], agg={"c": min,
+    #                                          "d": max
+    #                                          })
+
+    reg_frame.groupby(by=["name"], agg={"c": min,
                                              "d": max
                                              })
 
@@ -59,9 +63,9 @@ def main():
 
 def print_series(serie: Series):
     #print(serie.max())
-    print(serie.min())
-    print(serie.mean())
-    print(serie.std())
+    #print(serie.min())
+    #print(serie.mean())
+    #print(serie.std())
     print(serie.count())
 
 

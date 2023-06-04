@@ -132,47 +132,131 @@ class DataFrame:
         return self.__columns_indexes
 
     def data_to_series_list(self, by, agg=None):
+        access_as_rows = self.makeColumnsRows()
         real_list = []
         used_values = []
-        same_row_numbers = []
+        shared_values = []
+        repeat_rows = []
+        agg_raw_list = []
 
-        for x in range(len(by)):
-            for y in range(len(by[x])):
-                if self.__columns_indexes[by[x]].data[y] not in self.__columns_indexes[by[x]].data:
+        for x in range(len(access_as_rows)):
+            for y in range(len(by)):
+                column_num = list(self.__columns_indexes.keys()).index(by[y])
+                if by[y] not in self.__columns_indexes.keys():
                     print("error, column is not in list")
-                elif self.__columns_indexes[by[x]].data[y] in used_values:
-                    print("used")
-                    same_row_numbers.append(y)
+                elif access_as_rows[x][column_num] in used_values:
+                    shared_values.append(access_as_rows[x])
+                    repeat_rows.append([x, access_as_rows[x][column_num], by[y]])
+                    #access_as_rows[x][column_num] = "repeated"
                     continue
-                else:
-                    #final_series_by = Series(data=self.__columns_indexes[by[x]].data, name=by[x])
-                    #real_list.append(final_series_by)
-                    #print("This is the name " + str(name))
-                    used_values.append(self.__columns_indexes[by[x]].data[y])
 
-        for x in range(len(same_row_numbers)):
-            print(self.__columns_indexes[same_row_numbers[x]])
-            print(same_row_numbers)
-            print(self.__columns_indexes[by[used_values[x]].data.index()])
+                used_values.append(access_as_rows[x][column_num])
 
-        for column in agg:
-            if column not in self.__columns_indexes.keys():
+        first_sames = self.find_first_samesies(access_as_rows, repeat_rows)
+
+        for x in range(len(agg)):
+            agg_val_list = list(agg.values())
+            agg_key_list = list(agg.keys())
+
+            column_num = list(self.__columns_indexes.keys()).index(agg_key_list[x])
+
+            if agg_key_list[x] not in self.__columns_indexes.keys():
                 print("error, column is not in list")
             else:
-                new_list = []
-                for x in range(len(self.__columns_indexes[column].data)):
-                    pass
-                    #new_list.append(agg[column])
-                #final_series_arr = Series(data=new_list, name=column)
-                #real_list.append(final_series_arr)
-        print(real_list)
-        # print(used_values)
+                #print("your agg column is here " + str(agg_key_list[x]))
+                #print("your agg function is here " + str(agg_val_list[x]))
+
+                for y in range(len(first_sames)):
+                    new_list = []
+                    temp_list = []
+                    new_list.append((agg_key_list[x]))
+                    new_list.append(first_sames[y][1])
+                    temp_list.append(access_as_rows[first_sames[y][0]][column_num])
+                    for z in range(len(repeat_rows)):
+                        if first_sames[y][1] == repeat_rows[z][1]:
+                            temp_list.append(access_as_rows[repeat_rows[z][0]][column_num])
+                    new_list.append(agg_val_list[x](temp_list))
+                    agg_raw_list.append(new_list)
+
+        reversed_repeat = repeat_rows[::-1]
+        for x in range(len(repeat_rows)):
+            access_as_rows.pop(reversed_repeat[x][0])
+
+        print("THE NEW agg_list ROWS " + str(agg_raw_list))
+        print("THE NEW ACCESS ROWS " + str(access_as_rows))
+
+        access_as_rows = self.modify_the_aggs(agg_raw_list, access_as_rows)
         return real_list
+
+    def modify_the_aggs(self, agg_raw_list, access_as_rows):
+        final_list = []
+
+        for x in range(len(agg_raw_list)):
+            column_num = list(self.__columns_indexes.keys()).index(agg_raw_list[x][0])
+            for y in range(len(access_as_rows)):
+                access_as_rows[y][column_num] = agg_raw_list[x][2]
+            pass
+
+        print(access_as_rows)
+        return final_list
+
+    def find_first_samesies(self, access_as_rows, repeats):
+        final_array = []
+        for x in range(len(repeats)):
+            for y in range(len(access_as_rows)):
+                column_num = list(self.__columns_indexes.keys()).index(repeats[x][2])
+
+                if access_as_rows[y][column_num] == repeats[x][1]:
+                    final_array.append([y, access_as_rows[y][column_num], repeats[x][2]])
+                    for x in range(len(final_array)):
+                        for y in range(x + 1, len(final_array)):
+                            if final_array[x][1] == final_array[y][1]:
+                                final_array.pop(y)
+                    break
+
+        print("the original array is" + str(repeats))
+        print("the final array is" + str(final_array))
+
+        return final_array
+
     def is_empty_dict(self, the_dict):
         return not bool(the_dict)
 
     def is_overlapping_arrays(self, array1, array2):
         return not set(array1).isdisjoint(set(array2))
+
+    def makeColumnsRows(self):
+        final_array = []
+        #print(self.__columns_indexes.values())
+        for x in range(self.data[0].size):
+            sub_array = []
+            # name = str((list(self.__columns_indexes.keys())[x]))
+            # print("hihi " + str(name))
+            # sub_array.append(str(name))
+            for y in range(len(self.__columns_indexes.values())):
+
+                sub_array.append(self.data[y][x])
+            final_array.append(sub_array)
+        #print(final_array)
+
+        return final_array
+
+    def makeRowsColumns(self):
+        final_array = []
+        print("why " + str(self.data))
+        #print(self.__columns_indexes.values())
+        for x in range(self.data[0].size):
+            sub_array = []
+            # name = str((list(self.__columns_indexes.keys())[x]))
+            # print("hihi " + str(name))
+            # sub_array.append(str(name))
+            for y in range(len(self.__columns_indexes.values())):
+
+                sub_array.append(self.data[y][x])
+            final_array.append(sub_array)
+        #print(final_array)
+
+        return final_array
 
     # def data_to_series_list(self, by, agg=None):
     #     real_list = []
@@ -201,11 +285,6 @@ class DataFrame:
     #             #real_list.append(final_series_arr)
     #     print(used_columns)
     #     return real_list
-    def is_empty_dict(self, the_dict):
-        return not bool(the_dict)
-
-    def is_overlapping_arrays(self, array1, array2):
-        return not set(array1).isdisjoint(set(array2))
 
     def get_column_names(self):
         names = []
