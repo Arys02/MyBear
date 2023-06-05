@@ -1,12 +1,14 @@
 import copy
+import numbers
 from typing import List, Dict, Union, Callable, Any
+from typing_extensions import Self
 import csv
 
 from src.Series import Series
 
 
 class DataFrame:
-    def __init__(self, data, column=None, dtype=None, clone=False) -> None:
+    def __init__(self, data: Union[List[Series], List[List[numbers.Number]]], column=None, dtype=None, clone=False) -> None:
         self.size = len(data)
         if isinstance(data, list) and self.size > 0 and isinstance(data[0], Series):
             self.__height = get_series_list_height(data)
@@ -14,6 +16,8 @@ class DataFrame:
         elif isinstance(data, list) and isinstance(column, list):
             self.__height = get_list_height(data)
             self.data = [Series(value, col, clone=clone, capacity=self.__height) for value, col in zip(data, column)]
+        elif self.size == 0:
+            self.data = []
         else:
             raise TypeError
 
@@ -42,20 +46,23 @@ class DataFrame:
         return s
 
     def __getitem__(self, item):
+        if isinstance(item, str):
+            return self.__columns_indexes[item]
+
         if len(item) != 2:
             raise TypeError
-        #iloc[n, n] -> VALUE
+        # iloc[n, n] -> VALUE
         if isinstance(item[0], int) and isinstance(item[1], int):
             return self.data[item[1]][item[0]]
-        #iloc[a:b, n] -> SERIES
+        # iloc[a:b, n] -> SERIES
         if isinstance(item[0], slice) and isinstance(item[1], int):
             return self.data[item[1]][item[0]].copy()
-        #iloc[n, a:b] -> DATAFRAME
+        # iloc[n, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], int):
             lst = [x[item[0]:(item[0] + 1)] for x in self.data[item[1]]]
             s = [Series(l.data, l.name) for l in lst]
             return DataFrame(data=s, clone=True)
-        #iloc[x:y, a:b] -> DATAFRAME
+        # iloc[x:y, a:b] -> DATAFRAME
         if isinstance(item[1], slice) and isinstance(item[0], slice):
             lst = [x[item[0]] for x in self.data[item[1]]]
             s = [Series(l.data, l.name) for l in lst]
@@ -81,10 +88,9 @@ class DataFrame:
     def read_csv(self: str, delimiter: str = ","):
         with open(self, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
-            rows = list(map(list, zip(* list(reader))))
+            rows = list(map(list, zip(*list(reader))))
         s = [Series(list(map(int, x[1:])), x[0]) for x in rows]
         return DataFrame(data=s)
-
 
     def read_json(
             path: str,
@@ -306,13 +312,125 @@ class DataFrame:
             names.append(self.data[x].name)
         return names
 
+    def without(
+            self,
+            column_name: str
+    ) -> Self:
+        index = self.get_col_index(column_name)
+        if index == -1:
+            return self
+
+        return self.iloc[0:, 0: index].glue(self.iloc[0:, index+1:])
+
+    def get_col_index(
+            self,
+            column_name: str
+    ) -> int:
+        for column_index in range(len(self.data)):
+            if self.data[column_index].name == column_name:
+                return column_index
+
+        return -1
+
     def join(
             self,
-            other,
+            other: Self,
             left_on: Union[List[str], str],
             right_on: Union[List[str], str],
-            how: str = "left"):
-        return 0  # TODO
+            how: str = "left") -> Self:
+
+        validate_join_params(left_on, right_on, how)
+
+        if how == "inner":
+            print("impl")
+        elif how == "outer":
+            print("impl")
+        elif how == "right":
+            return self.join_left(other, self, right_on, left_on)
+        else:
+            return self.join_left(self, other, left_on, right_on)
+
+    def join_left(
+            self,
+            left_df: Self,
+            right_df: Self,
+            left_on: Union[List[str], str],
+            right_on: Union[List[str], str],
+    ) -> Self:
+        if isinstance(left_on, str):
+            return self.join_left_unique_key(left_df, right_df, left_on, right_on)
+        return self.join_left_multi_key(left_df, right_df, left_on, right_on)
+
+    def join_left_unique_key(
+            self,
+            left_df: Self,
+            right_df: Self,
+            left_on: str,
+            right_on: str
+    ) -> Self:
+        joined_on: Series = left_df[left_on]
+        joining_on: Series = right_df[right_on]
+
+        joining_rows_indexes: List[(int, int)] = []
+        for joined_row_index in range(len(joined_on.data)):
+            for joining_row_index in range(len(joining_on.data)):
+                if joining_on.data[joining_row_index] == joined_on.data[joined_row_index]:
+                    joining_rows_indexes.append((joined_row_index, joining_row_index))
+                    break
+
+        print("JOINING ROW INDEXES:")
+        print(joining_rows_indexes)
+
+    def join_left_multi_key(
+            self,
+            left_df: Self,
+            right_df: Self,
+            left_on: List[str],
+            right_on: List[str]
+    ) -> Self:
+        pass
+
+    def glue(
+            self,
+            other: Self) -> Self:
+
+        glued_height = self.__height
+        glued_series: List[Series] = []
+        for column in self.data:
+            glued_series.append(column)
+        for column in other.data:
+            glued_series.append(column.resize(glued_height))
+
+        return DataFrame(glued_series)
+
+
+def validate_join_params(
+        left_on: Union[List[str], str],
+        right_on: Union[List[str], str],
+        how: str):
+    left_on_and_right_on_are_same_type(left_on, right_on)
+
+    if isinstance(left_on, list) and not len(left_on) == len(right_on):
+        raise TypeError("right_on and left_on need to be the same size")
+
+    if how not in ["left", "right", "inner", "outer"]:
+        raise TypeError("how value can only be: left, right, inner, outer (got {0})".format(how))
+
+
+def left_on_and_right_on_are_same_type(
+        left_on: Union[List[str], str],
+        right_on: Union[List[str], str]):
+    if isinstance(left_on, list) and not isinstance(right_on, list):
+        raise TypeError("right_on and left_on need to have the same type")
+    if isinstance(left_on, str) and not isinstance(right_on, str):
+        raise TypeError("right_on and left_on need to have the same type")
+
+
+def get_series_indexes(indexes: Union[List[str], str]) -> List[str]:
+    if isinstance(indexes, str):
+        return [indexes]
+    return indexes
+
 
 def get_series_list_height(series_list: List[Series]) -> int:
     height = 0
