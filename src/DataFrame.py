@@ -182,23 +182,38 @@ class DataFrame:
         for x in range(len(repeat_rows)):
             access_as_rows.pop(reversed_repeat[x][0])
 
-        print("THE NEW agg_list ROWS " + str(agg_raw_list))
-        print("THE NEW ACCESS ROWS " + str(access_as_rows))
+        # print("THE NEW agg_list ROWS " + str(agg_raw_list))
+        # print("THE NEW ACCESS ROWS " + str(access_as_rows))
 
-        access_as_rows = self.modify_the_aggs(agg_raw_list, access_as_rows)
-        return real_list
+        access_as_rows = self.modify_the_aggs(agg_raw_list, access_as_rows, first_sames)
 
-    def modify_the_aggs(self, agg_raw_list, access_as_rows):
+
+        access_as_rows = self.makeRowsColumns(access_as_rows)
+
+        real_final_list = []
+        #print("THE GOOD STUFF HERE PLZ" + str(access_as_rows))
+        for x in range(len(access_as_rows)):
+            name = list(self.__columns_indexes.keys())
+            temp_boy = Series(data=access_as_rows[x], name=name[x])
+            real_final_list.append(temp_boy)
+
+        #print(real_final_list)
+
+        return real_final_list
+
+    def modify_the_aggs(self, agg_raw_list, access_as_rows, first_sames):
         final_list = []
 
         for x in range(len(agg_raw_list)):
-            column_num = list(self.__columns_indexes.keys()).index(agg_raw_list[x][0])
+            column_num_to_insert = list(self.__columns_indexes.keys()).index(agg_raw_list[x][0])
+            value_to_align = agg_raw_list[x][1]
             for y in range(len(access_as_rows)):
-                access_as_rows[y][column_num] = agg_raw_list[x][2]
-            pass
+                if first_sames[y][1] == value_to_align:
+                    #print(value_to_align + "HERE")
+                    access_as_rows[y][column_num_to_insert] = agg_raw_list[x][2]
 
-        print(access_as_rows)
-        return final_list
+        #print(access_as_rows)
+        return access_as_rows
 
     def find_first_samesies(self, access_as_rows, repeats):
         final_array = []
@@ -214,8 +229,8 @@ class DataFrame:
                                 final_array.pop(y)
                     break
 
-        print("the original array is" + str(repeats))
-        print("the final array is" + str(final_array))
+        # print("the original array is" + str(repeats))
+        # print("the final array is" + str(final_array))
 
         return final_array
 
@@ -241,18 +256,17 @@ class DataFrame:
 
         return final_array
 
-    def makeRowsColumns(self):
+    def makeRowsColumns(self, access_as_rows):
         final_array = []
-        print("why " + str(self.data))
         #print(self.__columns_indexes.values())
-        for x in range(self.data[0].size):
+        for x in range(len(access_as_rows[0])):
             sub_array = []
             # name = str((list(self.__columns_indexes.keys())[x]))
             # print("hihi " + str(name))
             # sub_array.append(str(name))
-            for y in range(len(self.__columns_indexes.values())):
+            for y in range(len(access_as_rows)):
 
-                sub_array.append(self.data[y][x])
+                sub_array.append(access_as_rows[y][x])
             final_array.append(sub_array)
         #print(final_array)
 
